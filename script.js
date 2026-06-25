@@ -1,16 +1,16 @@
 const chatLauncher = document.getElementById("chatLauncher");
 const openChatHero = document.getElementById("openChatHero");
 
-function openSophieChat() {
-  alert("Sophie chat is coming next. 🍷");
+function openBriaChat() {
+  alert("Bria chat is coming next. 🍷");
 }
 
 if (chatLauncher) {
-  chatLauncher.addEventListener("click", openSophieChat);
+  chatLauncher.addEventListener("click", openBriaChat);
 }
 
 if (openChatHero) {
-  openChatHero.addEventListener("click", openSophieChat);
+  openChatHero.addEventListener("click", openBriaChat);
 }
 
 const newsletterForm = document.querySelector(".newsletter form");
@@ -27,7 +27,7 @@ if (newsletterForm) {
       return;
     }
 
-    alert("You're on the list for Sophie's Weekly Pour. 🍷");
+    alert("You're on the list for Bria's Weekly Pour. 🍷");
     emailInput.value = "";
   });
 }
