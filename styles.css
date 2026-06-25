@@ -1,1 +1,378 @@
+/* =====================================================
+   SOPHIE DESIGN SYSTEM
+   Apple × Aesop
+===================================================== */
 
+:root {
+
+  /* Colors */
+
+  --bg: #faf8f5;
+  --surface: #ffffff;
+  --surface-alt: #f4f1ec;
+
+  --text: #2f3142;
+  --text-light: #6b6d76;
+
+  --accent: #6d597a;
+  --accent-hover: #5d4a68;
+
+  --border: #e7e1d8;
+
+  --success: #8aa17b;
+
+  /* Layout */
+
+  --container: 1200px;
+  --radius: 18px;
+  --radius-large: 28px;
+
+  /* Shadows */
+
+  --shadow-sm:
+    0 2px 10px rgba(0,0,0,.03);
+
+  --shadow:
+    0 10px 30px rgba(0,0,0,.05);
+
+  --shadow-hover:
+    0 18px 40px rgba(0,0,0,.08);
+
+  /* Animation */
+
+  --transition: .28s ease;
+
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+
+  margin:0;
+
+  background:var(--bg);
+
+  color:var(--text);
+
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "Segoe UI",
+    sans-serif;
+
+  line-height:1.65;
+
+  -webkit-font-smoothing:antialiased;
+
+}
+
+img{
+  max-width:100%;
+  display:block;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+button{
+  font:inherit;
+  cursor:pointer;
+}
+
+input{
+  font:inherit;
+}
+
+
+/* =====================================================
+   TYPOGRAPHY
+===================================================== */
+
+h1,
+h2,
+h3,
+h4{
+
+  margin:0;
+
+  line-height:1.05;
+
+  letter-spacing:-.04em;
+
+  font-weight:700;
+
+}
+
+h1{
+
+  font-size:clamp(3.5rem,8vw,6rem);
+
+}
+
+h2{
+
+  font-size:clamp(2.2rem,5vw,3.5rem);
+
+}
+
+h3{
+
+  font-size:1.35rem;
+
+}
+
+p{
+
+  margin:0;
+
+  color:var(--text-light);
+
+}
+
+.eyebrow{
+
+  text-transform:uppercase;
+
+  letter-spacing:.14em;
+
+  font-size:.72rem;
+
+  font-weight:600;
+
+  color:var(--accent);
+
+  margin-bottom:18px;
+
+}
+
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+
+section{
+
+  padding:120px 40px;
+
+}
+
+.section{
+
+  max-width:var(--container);
+
+  margin:auto;
+
+}
+
+.section-heading{
+
+  max-width:700px;
+
+  margin-bottom:60px;
+
+}
+
+.section-heading.split{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-end;
+
+  gap:60px;
+
+}
+
+.section-heading.split p{
+
+  max-width:420px;
+
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.card-grid{
+
+  display:grid;
+
+  gap:30px;
+
+}
+
+.card-grid.three{
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+}
+
+.card-grid.four{
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+}
+
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+.primary-button{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:16px 30px;
+
+  border:none;
+
+  border-radius:999px;
+
+  background:var(--accent);
+
+  color:white;
+
+  font-weight:600;
+
+  transition:var(--transition);
+
+}
+
+.primary-button:hover{
+
+  background:var(--accent-hover);
+
+  transform:translateY(-2px);
+
+}
+
+.secondary-button{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:16px 30px;
+
+  border-radius:999px;
+
+  border:1px solid var(--border);
+
+  background:white;
+
+  transition:var(--transition);
+
+}
+
+.secondary-button:hover{
+
+  background:var(--surface-alt);
+
+  transform:translateY(-2px);
+
+}
+
+
+/* =====================================================
+   CARD SYSTEM
+===================================================== */
+
+.feature-card,
+.article-card,
+.shop-card,
+.guide-card{
+
+  background:var(--surface);
+
+  border:1px solid var(--border);
+
+  border-radius:var(--radius-large);
+
+  padding:34px;
+
+  transition:var(--transition);
+
+}
+
+.feature-card:hover,
+.article-card:hover,
+.shop-card:hover,
+.guide-card:hover{
+
+  transform:translateY(-6px);
+
+  box-shadow:var(--shadow-hover);
+
+}
+
+.feature-card span{
+
+  display:inline-flex;
+
+  width:36px;
+  height:36px;
+
+  border-radius:50%;
+
+  align-items:center;
+  justify-content:center;
+
+  background:var(--surface-alt);
+
+  color:var(--accent);
+
+  font-size:.8rem;
+
+  margin-bottom:24px;
+
+}
+
+.feature-card h3,
+.article-card h3,
+.shop-card h3,
+.guide-card h3{
+
+  margin-bottom:14px;
+
+}
+
+.article-label{
+
+  font-size:.75rem;
+
+  color:var(--accent);
+
+  text-transform:uppercase;
+
+  letter-spacing:.08em;
+
+  margin-bottom:18px;
+
+}
