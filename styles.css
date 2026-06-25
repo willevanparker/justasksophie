@@ -513,3 +513,113 @@ section{
   background:var(--accent-hover);
   transform:translateY(-3px);
 }
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px){
+
+  body{
+    overflow-x:hidden;
+  }
+
+  .site-header{
+    position:relative;
+    padding:22px 20px;
+    flex-wrap:wrap;
+  }
+
+  .logo{
+    font-size:1.15rem;
+  }
+
+  .main-nav{
+    order:3;
+    width:100%;
+    gap:18px;
+    overflow-x:auto;
+    padding-top:12px;
+    font-size:.95rem;
+  }
+
+  .nav-cta{
+    padding:10px 16px;
+    font-size:.9rem;
+  }
+
+  section,
+  .hero{
+    padding-left:22px;
+    padding-right:22px;
+  }
+
+  .hero{
+    min-height:auto;
+    padding-top:80px;
+    padding-bottom:90px;
+  }
+
+  h1{
+    font-size:clamp(3rem,14vw,4.5rem);
+  }
+
+  h2{
+    font-size:clamp(2.1rem,10vw,3rem);
+  }
+
+  .hero-text{
+    font-size:1rem;
+    max-width:100%;
+  }
+
+  .section{
+    padding-top:80px;
+    padding-bottom:80px;
+  }
+
+  .section-heading.split{
+    display:block;
+  }
+
+  .section-heading.split p{
+    margin-top:18px;
+    max-width:100%;
+  }
+
+  .card-grid.three,
+  .card-grid.four{
+    grid-template-columns:1fr;
+  }
+
+  .feature-card,
+  .article-card,
+  .shop-card,
+  .guide-card{
+    padding:28px;
+  }
+
+  .newsletter{
+    grid-template-columns:1fr;
+  }
+
+  .newsletter form{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .site-footer{
+    flex-direction:column;
+    padding:50px 22px 90px;
+  }
+
+  .footer-links{
+    justify-content:flex-start;
+  }
+
+  .chat-launcher{
+    right:18px;
+    bottom:18px;
+    padding:14px 20px;
+  }
+}
