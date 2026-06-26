@@ -1343,3 +1343,35 @@ section{
     margin:0;
   }
 }
+
+/* Mobile hamburger nav */
+.menu-toggle{
+  display:none;
+}
+
+@media (max-width:520px){
+  .site-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:nowrap;
+    padding:28px 22px;
+  }
+
+  .main-nav,
+  .nav-cta{
+    display:none;
+  }
+
+  .menu-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin-left:auto;
+    border:0;
+    background:transparent;
+    color:var(--ink);
+    font-size:2.2rem;
+    line-height:1;
+  }
+}
