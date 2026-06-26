@@ -1,320 +1,134 @@
-(() => {
-  "use strict";
+const shops = [
+  {
+    name: "Murphy's Wine Shop",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30306",
+    neighborhood: "Virginia Highland",
+    description: "Claude responded: Where rare, esoteric, and eco-conscious wines meet expert guidance, tastings, and winemaker dinners for novices and connoisseurs alike.",
+    tags: ["Atlanta staple", "Large selection", "Everyday bottles"],
+    website: "https://murphyswinestore.com"
+  },
+  {
+    name: "Perrine's Wine Shop",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30318",
+    neighborhood: "Westside",
+    description: "A polished neighborhood wine shop known for thoughtful selections, tastings, and gift-worthy bottles.",
+    tags: ["Curated", "Tastings", "Gift bottles"],
+    website: "https://perrineswine.com"
+  },
+  {
+    name: "Elemental Spirits Co.",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30306",
+    neighborhood: "Poncey-Highland",
+    description: "A modern bottle shop with natural wine, spirits, cocktail essentials, and a stylish neighborhood feel.",
+    tags: ["Natural wine", "Cocktails", "Modern"],
+    website: "https://elementalspirits.co"
+  },
+  {
+    name: "VinoTeca",
+    city: "Atlanta",
+    state: "GA",
+    zip: "30308",
+    neighborhood: "Inman Park",
+    description: "An approachable shop for discovering interesting wines, pairing ideas, and small-producer bottles.",
+    tags: ["Small producers", "Approachable", "Pairings"],
+    website: "#"
+  }
+];
 
-  const CHAT_ENDPOINT = "/.netlify/functions/ask-bria";
+const menuToggle = document.getElementById("menuToggle");
+const mobileNav = document.getElementById("mobileNav");
+const shopSearch = document.getElementById("shopSearch");
+const shopList = document.getElementById("shopList");
+const resultsMeta = document.getElementById("resultsMeta");
 
-  const elements = {
-    menuToggle: document.querySelector(".menu-toggle"),
-    mainNav: document.querySelector(".main-nav"),
+function renderShops(list) {
+  shopList.innerHTML = "";
 
-    chatLauncher: document.getElementById("chatLauncher"),
-    openChatNav: document.getElementById("openChatNav"),
-    openChatHero: document.getElementById("openChatHero"),
-    openChatStart: document.getElementById("openChatStart"),
-    chatPanel: document.getElementById("chatPanel"),
-    chatPanelClose: document.getElementById("chatPanelClose"),
-    chatForm: document.getElementById("chatForm"),
-    chatInput: document.getElementById("chatInput"),
-    chatMessages: document.getElementById("chatMessages"),
-
-    newsletterForm: document.getElementById("newsletterForm"),
-    newsletterEmail: document.getElementById("newsletterEmail"),
-    newsletterStatus: document.getElementById("newsletterStatus")
-  };
-
-  const chatState = {
-    isOpen: false,
-    isBusy: false
-  };
-
-  const menuState = {
-    isOpen: false
-  };
-
-  function openMobileMenu() {
-    setMobileMenuOpen(true);
+  if (!list.length) {
+    shopList.innerHTML = `
+      <article class="shop-card">
+        <h3>No shops found yet.</h3>
+        <p class="shop-description">
+          Try searching by city, state, ZIP, or shop name.
+        </p>
+      </article>
+    `;
+    resultsMeta.textContent = "No matching shops";
+    return;
   }
 
-  function closeMobileMenu() {
-    setMobileMenuOpen(false);
+  resultsMeta.textContent =
+    list.length === shops.length
+      ? "Featured independent wine shops"
+      : `${list.length} matching shop${list.length === 1 ? "" : "s"}`;
+
+  list.forEach((shop) => {
+    const card = document.createElement("article");
+    card.className = "shop-card";
+
+    card.innerHTML = `
+      <h3>${shop.name}</h3>
+      <p class="shop-location">
+        ${shop.neighborhood} · ${shop.city}, ${shop.state} ${shop.zip}
+      </p>
+      <p class="shop-description">${shop.description}</p>
+      <div class="shop-tags">
+        ${shop.tags.map((tag) => `<span>${tag}</span>`).join("")}
+      </div>
+      <a class="shop-link" href="${shop.website}" target="_blank" rel="noopener">
+        Visit shop →
+      </a>
+    `;
+
+    shopList.appendChild(card);
+  });
+}
+
+function filterShops(query) {
+  const cleanQuery = query.trim().toLowerCase();
+
+  if (!cleanQuery) {
+    renderShops(shops);
+    return;
   }
 
-  function toggleMobileMenu(event) {
-    event.stopPropagation();
-    setMobileMenuOpen(!menuState.isOpen);
-  }
-
-  function setMobileMenuOpen(isOpen) {
-    if (!elements.menuToggle || !elements.mainNav) return;
-
-    menuState.isOpen = isOpen;
-
-    elements.mainNav.dataset.open = String(isOpen);
-    elements.menuToggle.setAttribute("aria-expanded", String(isOpen));
-    elements.menuToggle.setAttribute(
-      "aria-label",
-      isOpen ? "Close menu" : "Open menu"
-    );
-  }
-
-  function openChat() {
-    closeMobileMenu();
-    setChatOpen(true);
-  }
-
-  function closeChat() {
-    setChatOpen(false);
-  }
-
-  function toggleChat() {
-    setChatOpen(!chatState.isOpen);
-  }
-
-  function setChatOpen(isOpen) {
-    if (!elements.chatPanel || !elements.chatLauncher) return;
-
-    chatState.isOpen = isOpen;
-
-    elements.chatPanel.dataset.open = String(isOpen);
-    elements.chatPanel.setAttribute("aria-hidden", String(!isOpen));
-    elements.chatLauncher.setAttribute("aria-expanded", String(isOpen));
-
-    if (isOpen && elements.chatInput) {
-      window.setTimeout(() => {
-        elements.chatInput.focus();
-      }, 100);
-    }
-  }
-
-  function addChatMessage(text, sender, options = {}) {
-    if (!elements.chatMessages) return null;
-
-    const message = document.createElement("div");
-    message.className = `chat-message ${sender}`;
-
-    if (options.isLoading) {
-      message.classList.add("is-loading");
-      message.setAttribute("aria-label", "Bria is thinking");
-    }
-
-    message.textContent = text;
-    elements.chatMessages.appendChild(message);
-    scrollChatToBottom();
-
-    return message;
-  }
-
-  function removeMessage(message) {
-    if (message && message.parentNode) {
-      message.parentNode.removeChild(message);
-    }
-  }
-
-  function scrollChatToBottom() {
-    if (!elements.chatMessages) return;
-    elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
-  }
-
-  function setChatBusy(isBusy) {
-    if (!elements.chatForm || !elements.chatInput) return;
-
-    chatState.isBusy = isBusy;
-    elements.chatForm.dataset.busy = String(isBusy);
-    elements.chatInput.disabled = isBusy;
-
-    const submitButton = elements.chatForm.querySelector("button[type='submit']");
-
-    if (submitButton) {
-      submitButton.disabled = isBusy;
-      submitButton.textContent = isBusy ? "Sending..." : "Send";
-    }
-  }
-
-  async function askBria(message) {
-    const response = await fetch(CHAT_ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await safelyParseJson(response);
-
-    if (!response.ok) {
-      throw new Error(
-        data.error || "Sorry, Bria had trouble answering that. Please try again."
-      );
-    }
-
-    return data.reply || "Sorry, I had trouble answering that. Try again?";
-  }
-
-  async function safelyParseJson(response) {
-    try {
-      return await response.json();
-    } catch {
-      return {};
-    }
-  }
-
-  async function handleChatSubmit(event) {
-    event.preventDefault();
-
-    if (chatState.isBusy || !elements.chatInput) return;
-
-    const userMessage = elements.chatInput.value.trim();
-    if (!userMessage) return;
-
-    addChatMessage(userMessage, "user");
-    elements.chatInput.value = "";
-
-    const thinkingMessage = addChatMessage("Thinking...", "bria", {
-      isLoading: true
-    });
-
-    setChatBusy(true);
-
-    try {
-      const reply = await askBria(userMessage);
-      removeMessage(thinkingMessage);
-      addChatMessage(reply, "bria");
-    } catch (error) {
-      removeMessage(thinkingMessage);
-      addChatMessage(
-        error.message ||
-          "Sorry, Bria had trouble connecting. Please try again in a moment.",
-        "bria"
-      );
-    } finally {
-      setChatBusy(false);
-      elements.chatInput.focus();
-    }
-  }
-
-  function isClickOutsideChat(event) {
-    if (!elements.chatPanel || !chatState.isOpen) return false;
-
-    const clickTarget = event.target;
-
-    const openButtons = [
-      elements.chatLauncher,
-      elements.openChatNav,
-      elements.openChatHero,
-      elements.openChatStart
-    ].filter(Boolean);
-
-    const clickedPanel = elements.chatPanel.contains(clickTarget);
-    const clickedOpenButton = openButtons.some((button) =>
-      button.contains(clickTarget)
-    );
-
-    return !clickedPanel && !clickedOpenButton;
-  }
-
-  function isClickOutsideMenu(event) {
-    if (!elements.mainNav || !elements.menuToggle || !menuState.isOpen) {
-      return false;
-    }
-
-    const clickTarget = event.target;
-
-    const clickedMenu = elements.mainNav.contains(clickTarget);
-    const clickedToggle = elements.menuToggle.contains(clickTarget);
-
-    return !clickedMenu && !clickedToggle;
-  }
-
-  function handleDocumentClick(event) {
-    if (isClickOutsideChat(event)) {
-      closeChat();
-    }
-
-    if (isClickOutsideMenu(event)) {
-      closeMobileMenu();
-    }
-  }
-
-  function handleDocumentKeydown(event) {
-    if (event.key === "Escape") {
-      if (chatState.isOpen) closeChat();
-      if (menuState.isOpen) closeMobileMenu();
-    }
-  }
-
-  function setNewsletterStatus(message, state = "") {
-    if (!elements.newsletterStatus) return;
-
-    elements.newsletterStatus.textContent = message;
-    elements.newsletterStatus.dataset.state = state;
-  }
-
-  function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function handleNewsletterSubmit(event) {
-    event.preventDefault();
-
-    if (!elements.newsletterEmail) return;
-
-    const email = elements.newsletterEmail.value.trim();
-
-    if (!email) {
-      elements.newsletterEmail.setAttribute("aria-invalid", "true");
-      setNewsletterStatus("Enter your email address to join.", "error");
-      elements.newsletterEmail.focus();
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      elements.newsletterEmail.setAttribute("aria-invalid", "true");
-      setNewsletterStatus("That email address doesn't look quite right.", "error");
-      elements.newsletterEmail.focus();
-      return;
-    }
-
-    elements.newsletterEmail.removeAttribute("aria-invalid");
-    setNewsletterStatus("You're on the list for Bria's Weekly Pour. 🍷", "success");
-    elements.newsletterEmail.value = "";
-  }
-
-  function handleNewsletterInput() {
-    if (!elements.newsletterEmail) return;
-
-    if (elements.newsletterEmail.getAttribute("aria-invalid") === "true") {
-      elements.newsletterEmail.removeAttribute("aria-invalid");
-      setNewsletterStatus("");
-    }
-  }
-
-  function bindEvents() {
-    elements.menuToggle?.addEventListener("click", toggleMobileMenu);
-
-    elements.mainNav?.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", closeMobileMenu);
-    });
-
-    elements.chatLauncher?.addEventListener("click", toggleChat);
-    elements.openChatNav?.addEventListener("click", openChat);
-    elements.openChatHero?.addEventListener("click", openChat);
-    elements.openChatStart?.addEventListener("click", openChat);
-    elements.chatPanelClose?.addEventListener("click", closeChat);
-
-    elements.chatForm?.addEventListener("submit", handleChatSubmit);
-
-    document.addEventListener("click", handleDocumentClick);
-    document.addEventListener("keydown", handleDocumentKeydown);
-
-    elements.newsletterForm?.addEventListener("submit", handleNewsletterSubmit);
-    elements.newsletterEmail?.addEventListener("input", handleNewsletterInput);
-  }
-
-  function init() {
-    bindEvents();
-    setMobileMenuOpen(false);
-    setChatOpen(false);
-  }
-
-  init();
-})();
+  const filtered = shops.filter((shop) => {
+    const searchableText = [
+      shop.name,
+      shop.city,
+      shop.state,
+      shop.zip,
+      shop.neighborhood,
+      shop.description,
+      ...shop.tags
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(cleanQuery);
+  });
+
+  renderShops(filtered);
+}
+
+menuToggle.addEventListener("click", () => {
+  mobileNav.classList.toggle("open");
+});
+
+mobileNav.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    mobileNav.classList.remove("open");
+  });
+});
+
+shopSearch.addEventListener("input", (event) => {
+  filterShops(event.target.value);
+});
+
+renderShops(shops);
