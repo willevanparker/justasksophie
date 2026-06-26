@@ -4,6 +4,9 @@
   const CHAT_ENDPOINT = "/.netlify/functions/ask-bria";
 
   const elements = {
+    menuToggle: document.querySelector(".menu-toggle"),
+    mainNav: document.querySelector(".main-nav"),
+
     chatLauncher: document.getElementById("chatLauncher"),
     openChatNav: document.getElementById("openChatNav"),
     openChatHero: document.getElementById("openChatHero"),
@@ -13,6 +16,7 @@
     chatForm: document.getElementById("chatForm"),
     chatInput: document.getElementById("chatInput"),
     chatMessages: document.getElementById("chatMessages"),
+
     newsletterForm: document.getElementById("newsletterForm"),
     newsletterEmail: document.getElementById("newsletterEmail"),
     newsletterStatus: document.getElementById("newsletterStatus")
@@ -23,7 +27,38 @@
     isBusy: false
   };
 
+  const menuState = {
+    isOpen: false
+  };
+
+  function openMobileMenu() {
+    setMobileMenuOpen(true);
+  }
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
+  }
+
+  function toggleMobileMenu(event) {
+    event.stopPropagation();
+    setMobileMenuOpen(!menuState.isOpen);
+  }
+
+  function setMobileMenuOpen(isOpen) {
+    if (!elements.menuToggle || !elements.mainNav) return;
+
+    menuState.isOpen = isOpen;
+
+    elements.mainNav.dataset.open = String(isOpen);
+    elements.menuToggle.setAttribute("aria-expanded", String(isOpen));
+    elements.menuToggle.setAttribute(
+      "aria-label",
+      isOpen ? "Close menu" : "Open menu"
+    );
+  }
+
   function openChat() {
+    closeMobileMenu();
     setChatOpen(true);
   }
 
@@ -147,7 +182,8 @@
     } catch (error) {
       removeMessage(thinkingMessage);
       addChatMessage(
-        error.message || "Sorry, Bria had trouble connecting. Please try again in a moment.",
+        error.message ||
+          "Sorry, Bria had trouble connecting. Please try again in a moment.",
         "bria"
       );
     } finally {
@@ -176,15 +212,33 @@
     return !clickedPanel && !clickedOpenButton;
   }
 
+  function isClickOutsideMenu(event) {
+    if (!elements.mainNav || !elements.menuToggle || !menuState.isOpen) {
+      return false;
+    }
+
+    const clickTarget = event.target;
+
+    const clickedMenu = elements.mainNav.contains(clickTarget);
+    const clickedToggle = elements.menuToggle.contains(clickTarget);
+
+    return !clickedMenu && !clickedToggle;
+  }
+
   function handleDocumentClick(event) {
     if (isClickOutsideChat(event)) {
       closeChat();
     }
+
+    if (isClickOutsideMenu(event)) {
+      closeMobileMenu();
+    }
   }
 
   function handleDocumentKeydown(event) {
-    if (event.key === "Escape" && chatState.isOpen) {
-      closeChat();
+    if (event.key === "Escape") {
+      if (chatState.isOpen) closeChat();
+      if (menuState.isOpen) closeMobileMenu();
     }
   }
 
@@ -235,6 +289,12 @@
   }
 
   function bindEvents() {
+    elements.menuToggle?.addEventListener("click", toggleMobileMenu);
+
+    elements.mainNav?.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+
     elements.chatLauncher?.addEventListener("click", toggleChat);
     elements.openChatNav?.addEventListener("click", openChat);
     elements.openChatHero?.addEventListener("click", openChat);
@@ -252,6 +312,7 @@
 
   function init() {
     bindEvents();
+    setMobileMenuOpen(false);
     setChatOpen(false);
   }
 
