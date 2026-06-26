@@ -154,3 +154,75 @@ chatOverlay.addEventListener("click", (event) => {
     chatOverlay.classList.remove("open");
   }
 });
+
+// ==========================
+// Chat Messaging
+// ==========================
+
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const sendMessage = document.getElementById("sendMessage");
+
+function addMessage(text, sender) {
+  const message = document.createElement("div");
+  message.className =
+    sender === "user" ? "user-message" : "assistant-message";
+  message.textContent = text;
+
+  chatMessages.appendChild(message);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function sendChatMessage() {
+  const message = chatInput.value.trim();
+
+  if (!message) return;
+
+  addMessage(message, "user");
+  chatInput.value = "";
+
+  const loading = document.createElement("div");
+  loading.className = "assistant-message";
+  loading.textContent = "Thinking...";
+  chatMessages.appendChild(loading);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  try {
+    const response = await fetch("/.netlify/functions/ask-bria", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message
+      })
+    });
+
+    const data = await response.json();
+
+    loading.remove();
+
+    if (!response.ok) {
+      addMessage(data.error || "Something went wrong.", "assistant");
+      return;
+    }
+
+    addMessage(data.reply, "assistant");
+
+  } catch (error) {
+    loading.remove();
+
+    addMessage(
+      "Sorry, I couldn't connect right now. Please try again.",
+      "assistant"
+    );
+  }
+}
+
+sendMessage.addEventListener("click", sendChatMessage);
+
+chatInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    sendChatMessage();
+  }
+});
