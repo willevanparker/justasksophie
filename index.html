@@ -142,10 +142,66 @@
 
   </main>
 
-  <button class="concierge-button" aria-label="Open wine concierge">
-    <span>Need help?</span>
-    <strong>Ask</strong>
-  </button>
+<button
+  class="concierge-button"
+  id="openConcierge"
+  aria-label="Open ShopLocal.Wine Concierge"
+>
+  🍷
+</button>
+
+<div class="chat-overlay" id="chatOverlay">
+
+  <div class="chat-window">
+
+    <div class="chat-header">
+
+      <div class="chat-header-left">
+        <div class="chat-avatar">🍷</div>
+
+        <div>
+          <h3>Sophie</h3>
+          <p>Helping you discover remarkable wine.</p>
+        </div>
+      </div>
+
+      <button id="closeConcierge" class="chat-close">
+        ×
+      </button>
+
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+
+<div class="assistant-message">
+  👋 I'm Sophie!
+  <br><br>
+  How can I help?
+</div>
+
+    </div>
+
+    <div class="chat-disclaimer">
+      Sophie provides general information and can make mistakes. Check important details before making decisions.
+    </div>
+
+    <div class="chat-input">
+
+      <input
+        id="chatInput"
+        type="text"
+        placeholder="Ask about wine..."
+      />
+
+      <button id="sendMessage">
+        →
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
   <footer class="site-footer">
     <div>
