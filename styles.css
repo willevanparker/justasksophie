@@ -1184,3 +1184,107 @@ section{
     transform:translateY(-3px);
   }
 }
+
+/* =====================================================
+   MOBILE FULL-SCREEN CHAT — ARCHIE STYLE
+===================================================== */
+
+@media (max-width:520px){
+  .chat-panel[data-open="true"]{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    max-width:none;
+    height:100dvh;
+    max-height:none;
+    border:0;
+    border-radius:0;
+    transform:none;
+    background:#fff;
+  }
+
+  .chat-panel-header{
+    padding:64px 28px 28px;
+    background:var(--wine);
+    color:#fff;
+    border-bottom:0;
+  }
+
+  .chat-panel-header h2{
+    color:#fff;
+    font-family:var(--sans);
+    font-size:1.35rem;
+  }
+
+  .chat-panel-header .eyebrow{
+    display:none;
+  }
+
+  .chat-panel-header::before{
+    content:"🍷";
+    width:58px;
+    height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-right:14px;
+    border-radius:50%;
+    background:#fff;
+    font-size:30px;
+  }
+
+  .chat-panel-close{
+    color:#fff;
+    border:0;
+    background:transparent;
+    font-size:2.4rem;
+  }
+
+  .chat-panel-body{
+    height:calc(100dvh - 150px);
+    padding:28px 22px 22px;
+  }
+
+  .chat-intro{
+    display:none;
+  }
+
+  .chat-messages{
+    flex:1;
+    max-height:none;
+    min-height:0;
+    padding-bottom:18px;
+  }
+
+  .chat-message{
+    max-width:86%;
+    padding:20px 22px;
+    border-radius:24px;
+    font-size:1.05rem;
+  }
+
+  .chat-form{
+    padding:12px 0 0;
+    border-top:0;
+  }
+
+  .chat-form input{
+    height:58px;
+    padding:0 18px;
+    border-radius:999px;
+    font-size:1rem;
+  }
+
+  .chat-form button{
+    width:58px;
+    height:58px;
+    padding:0;
+    border-radius:50%;
+    font-size:0;
+  }
+
+  .chat-form button::before{
+    content:"➜";
+    font-size:1.5rem;
+  }
+}
