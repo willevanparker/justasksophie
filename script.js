@@ -197,17 +197,19 @@ async function sendChatMessage() {
         message
       })
     });
+const data = await response.json();
 
-    const data = await response.json();
+loading.remove();
 
-    loading.remove();
+if (!response.ok) {
+  addMessage(
+    data.error || JSON.stringify(data),
+    "assistant"
+  );
+  return;
+}
 
-    if (!response.ok) {
-      addMessage(data.error || "Something went wrong.", "assistant");
-      return;
-    }
-
-    addMessage(data.reply, "assistant");
+addMessage(data.reply, "assistant");
 
   } catch (error) {
     loading.remove();
