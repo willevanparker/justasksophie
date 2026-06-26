@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,10 @@
 
   <title>Just Ask Bria | Your Approachable AI Sommelier</title>
   <meta name="description" content="Bria is an approachable AI sommelier who helps you understand wine, discover bottles, explore guides, and shop curated wine accessories." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,560;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -28,16 +31,28 @@
   <main>
     <section class="hero" id="ask">
       <div class="hero-inner">
-        <p class="eyebrow">Your approachable AI sommelier</p>
-        <h1>Wine question?<br />Just ask Bria.</h1>
-        <p class="hero-text">
-          Wine can feel complicated. Bria makes it easier — with clear answers,
-          helpful guides, curated recommendations, and a voice that never makes
-          you feel like you should already know.
-        </p>
-        <div class="hero-actions">
-          <button class="primary-button" id="openChatHero">Ask Bria</button>
-          <a href="#articles" class="secondary-button">Explore the site</a>
+        <div class="hero-copy">
+          <p class="eyebrow">Your approachable AI sommelier</p>
+          <h1>Wine question?<br />Just <em>ask</em> Bria.</h1>
+          <p class="hero-text">
+            Wine can feel complicated. Bria makes it easier — with clear answers,
+            helpful guides, curated recommendations, and a voice that never makes
+            you feel like you should already know.
+          </p>
+          <div class="hero-actions">
+            <button class="primary-button" id="openChatHero">Ask Bria</button>
+            <a href="#articles" class="secondary-button">Explore the site</a>
+          </div>
+        </div>
+
+        <div class="hero-glass" aria-hidden="true">
+          <div class="hero-glass-wrap">
+            <div class="glass-bowl">
+              <div class="glass-wine"></div>
+            </div>
+            <div class="glass-stem"></div>
+            <div class="glass-base"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -79,7 +94,7 @@
       <div class="section-heading split">
         <div>
           <p class="eyebrow">From Bria</p>
-          <h2>What’s happening in wine.</h2>
+          <h2>What's happening in wine.</h2>
         </div>
         <p>
           A Morning Brew-style look at wine stories, trends, bottles, regions,
@@ -122,12 +137,15 @@
       <div class="newsletter">
         <div>
           <p class="eyebrow">Newsletter</p>
-          <h3>Bria’s Weekly Pour</h3>
+          <h3>Bria's Weekly Pour</h3>
           <p>One friendly note each week with wine stories, guides, picks, and practical tips.</p>
         </div>
-        <form>
-          <input type="email" placeholder="Email address" aria-label="Email address" />
-          <button type="submit">Join</button>
+        <form class="newsletter-form" id="newsletterForm" novalidate>
+          <div class="newsletter-row">
+            <input type="email" id="newsletterEmail" placeholder="Email address" aria-label="Email address" aria-describedby="newsletterStatus" required />
+            <button type="submit">Join</button>
+          </div>
+          <p class="newsletter-status" id="newsletterStatus" role="status" aria-live="polite"></p>
         </form>
       </div>
     </section>
@@ -204,43 +222,3 @@
         </a>
       </div>
     </section>
-
-    <section class="section Bria-plus" id="Bria-plus">
-      <div class="coming-soon-card">
-        <p class="eyebrow">Bria+</p>
-        <h2>Your personal wine memory.</h2>
-        <p>
-          Coming soon: save bottles, tasting notes, ratings, photos, and memories
-          so Bria can help you remember what you loved — and what to try next.
-        </p>
-        <button class="secondary-button">Coming Soon</button>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer" id="about">
-    <div>
-      <a href="#" class="footer-logo">Bria</a>
-      <p>Built with ❤️ in Atlanta, GA.</p>
-    </div>
-
-    <div class="footer-links">
-      <a href="#guides">Guides</a>
-      <a href="#shop">Shop</a>
-      <a href="#Bria-plus">Bria+</a>
-      <a href="#">Glossary</a>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Affiliate Disclosure</a>
-    </div>
-  </footer>
-
-  <button class="chat-launcher" id="chatLauncher" aria-label="Open Bria chat">
-    Ask Bria
-  </button>
-
-  <script src="script.js"></script>
-</body>
-</html>
