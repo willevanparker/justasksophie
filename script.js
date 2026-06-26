@@ -5,7 +5,7 @@ const shops = [
     state: "GA",
     zip: "30306",
     neighborhood: "Virginia Highland",
-    description: "Claude responded: Where rare, esoteric, and eco-conscious wines meet expert guidance, tastings, and winemaker dinners for novices and connoisseurs alike.",
+    description: "Where rare, esoteric, and eco-conscious wines meet expert guidance, tastings, and winemaker dinners for novices and connoisseurs alike.",
     tags: ["Atlanta staple", "Large selection", "Everyday bottles"],
     website: "https://murphyswinestore.com"
   },
@@ -37,7 +37,7 @@ const shops = [
     neighborhood: "Inman Park",
     description: "An approachable shop for discovering interesting wines, pairing ideas, and small-producer bottles.",
     tags: ["Small producers", "Approachable", "Pairings"],
-    website: "#"
+    website: "https://www.shopvinoteca.com"
   }
 ];
 
