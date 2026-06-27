@@ -119,6 +119,22 @@ if (window.mapboxgl && document.getElementById("wineMap")) {
 // Directory
 // ==========================
 
+function fitMapToShops(list) {
+  if (!map || !list.length) return;
+
+  const bounds = new mapboxgl.LngLatBounds();
+
+  list.forEach((shop) => {
+    bounds.extend([shop.longitude, shop.latitude]);
+  });
+
+  map.fitBounds(bounds, {
+    padding: 80,
+    maxZoom: 14,
+    duration: 900
+  });
+}
+
 function renderShops(list) {
   if (!shopList) return;
 
@@ -179,6 +195,8 @@ card.dataset.shopId = shop.id;
   });
   });
 });
+
+  fitMapToShops(list);
 }
 
 function filterShops(query) {
