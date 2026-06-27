@@ -4,13 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>ShopLocal.Wine | Discover Local Wine Shops</title>
-  <meta
-    name="description"
-    content="ShopLocal.Wine is a curated directory of local wine shops across America."
-  />
+<title>ShopLocal.Wine | Discover Local Wine Shops</title>
 
-  <link rel="stylesheet" href="styles.css" />
+<meta
+  name="description"
+  content="ShopLocal.Wine is a curated directory of local wine shops across America."
+/>
+
+<link rel="stylesheet" href="styles.css" />
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.25.0/mapbox-gl.css" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -70,14 +73,10 @@
       Featured Atlanta shops
     </div>
   </div>
-
-  <div class="directory-layout">
-    <div class="map-panel">
-      <div class="map-placeholder">
-        <span class="map-pin">●</span>
-        <p>Interactive map coming soon</p>
-      </div>
-    </div>
+    <div class="directory-layout">
+<div class="map-panel">
+  <div id="wineMap" class="wine-map"></div>
+</div>
 
     <aside class="results-panel">
       <div class="desktop-search-panel">
@@ -238,6 +237,7 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.25.0/mapbox-gl.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
