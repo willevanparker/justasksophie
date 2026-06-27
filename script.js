@@ -5,7 +5,8 @@ const shops = [
     state: "GA",
     zip: "30306",
     neighborhood: "Virginia Highland",
-    description: "Where rare, esoteric, and eco-conscious wines meet expert guidance, tastings, and winemaker dinners for novices and connoisseurs alike.",
+    description:
+      "Where rare, esoteric, and eco-conscious wines meet expert guidance, tastings, and winemaker dinners for novices and connoisseurs alike.",
     tags: ["Atlanta staple", "Large selection", "Everyday bottles"],
     website: "https://murphyswinestore.com"
   },
@@ -15,7 +16,8 @@ const shops = [
     state: "GA",
     zip: "30318",
     neighborhood: "Westside",
-    description: "A polished neighborhood wine shop known for thoughtful selections, tastings, and gift-worthy bottles.",
+    description:
+      "A polished neighborhood wine shop known for thoughtful selections, tastings, and gift-worthy bottles.",
     tags: ["Curated", "Tastings", "Gift bottles"],
     website: "https://perrineswine.com"
   },
@@ -25,7 +27,8 @@ const shops = [
     state: "GA",
     zip: "30306",
     neighborhood: "Poncey-Highland",
-    description: "A modern bottle shop with natural wine, spirits, cocktail essentials, and a stylish neighborhood feel.",
+    description:
+      "A modern bottle shop with natural wine, spirits, cocktail essentials, and a stylish neighborhood feel.",
     tags: ["Natural wine", "Cocktails", "Modern"],
     website: "https://elementalspirits.co"
   },
@@ -35,7 +38,8 @@ const shops = [
     state: "GA",
     zip: "30308",
     neighborhood: "Inman Park",
-    description: "An approachable shop for discovering interesting wines, pairing ideas, and small-producer bottles.",
+    description:
+      "An approachable shop for discovering interesting wines, pairing ideas, and small-producer bottles.",
     tags: ["Small producers", "Approachable", "Pairings"],
     website: "https://www.shopvinoteca.com"
   }
@@ -51,18 +55,29 @@ const resultsMeta = document.getElementById("resultsMeta");
 // Mapbox
 // ==========================
 
-mapboxgl.accessToken = "pk.eyJ1Ijoid2lsbGV2YW5wYXJrZXIiLCJhIjoiY21xd2N2MGlzMWNzejJycTE2d25ndDlidyJ9.atPhHI0hq56xVEi3snh9ig";
+let map = null;
 
-const map = new mapboxgl.Map({
-  container: "wineMap",
-  style: "mapbox://styles/mapbox/streets-v12",
-  center: [-84.388, 33.749],
-  zoom: 11.5
-});
+if (window.mapboxgl && document.getElementById("wineMap")) {
+  mapboxgl.accessToken =
+    "pk.eyJ1Ijoid2lsbGV2YW5wYXJrZXIiLCJhIjoiY21xd2N2MGlzMWNzejJycTE2d25ndDlidyJ9.atPhHI0hq56xVEi3snh9ig";
 
-map.addControl(new mapboxgl.NavigationControl(), "top-right");
+  map = new mapboxgl.Map({
+    container: "wineMap",
+    style: "mapbox://styles/mapbox/streets-v12",
+    center: [-84.388, 33.749],
+    zoom: 11.5
+  });
+
+  map.addControl(new mapboxgl.NavigationControl(), "top-right");
+}
+
+// ==========================
+// Directory
+// ==========================
 
 function renderShops(list) {
+  if (!shopList) return;
+
   shopList.innerHTML = "";
 
   if (!list.length) {
@@ -100,7 +115,7 @@ function renderShops(list) {
       </p>
       <p class="shop-description">${shop.description}</p>
       <div class="shop-tags">
-        ${shop.tags.map(tag => `<span>${tag}</span>`).join("")}
+        ${shop.tags.map((tag) => `<span>${tag}</span>`).join("")}
       </div>
       <a class="shop-link" href="${shop.website}" target="_blank" rel="noopener">
         Visit shop →
@@ -109,7 +124,6 @@ function renderShops(list) {
 
     shopList.appendChild(card);
   });
-}
 }
 
 function filterShops(query) {
@@ -139,21 +153,29 @@ function filterShops(query) {
   renderShops(filtered);
 }
 
-menuToggle.addEventListener("click", () => {
-  mobileNav.classList.toggle("open");
-});
-
-mobileNav.querySelectorAll("a").forEach((link) => {
-  link.addEventListener("click", () => {
-    mobileNav.classList.remove("open");
+if (shopSearch) {
+  shopSearch.addEventListener("input", (event) => {
+    filterShops(event.target.value);
   });
-});
-
-shopSearch.addEventListener("input", (event) => {
-  filterShops(event.target.value);
-});
+}
 
 renderShops(shops);
+
+// ==========================
+// Menu
+// ==========================
+
+if (menuToggle && mobileNav) {
+  menuToggle.addEventListener("click", () => {
+    mobileNav.classList.toggle("open");
+  });
+
+  mobileNav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      mobileNav.classList.remove("open");
+    });
+  });
+}
 
 // ==========================
 // Chat UI
@@ -163,19 +185,21 @@ const openConcierge = document.getElementById("openConcierge");
 const closeConcierge = document.getElementById("closeConcierge");
 const chatOverlay = document.getElementById("chatOverlay");
 
-openConcierge.addEventListener("click", () => {
-  chatOverlay.classList.add("open");
-});
+if (openConcierge && closeConcierge && chatOverlay) {
+  openConcierge.addEventListener("click", () => {
+    chatOverlay.classList.add("open");
+  });
 
-closeConcierge.addEventListener("click", () => {
-  chatOverlay.classList.remove("open");
-});
-
-chatOverlay.addEventListener("click", (event) => {
-  if (event.target === chatOverlay) {
+  closeConcierge.addEventListener("click", () => {
     chatOverlay.classList.remove("open");
-  }
-});
+  });
+
+  chatOverlay.addEventListener("click", (event) => {
+    if (event.target === chatOverlay) {
+      chatOverlay.classList.remove("open");
+    }
+  });
+}
 
 // ==========================
 // Chat Messaging
@@ -186,9 +210,10 @@ const chatInput = document.getElementById("chatInput");
 const sendMessage = document.getElementById("sendMessage");
 
 function addMessage(text, sender) {
+  if (!chatMessages) return;
+
   const message = document.createElement("div");
-  message.className =
-    sender === "user" ? "user-message" : "assistant-message";
+  message.className = sender === "user" ? "user-message" : "assistant-message";
   message.textContent = text;
 
   chatMessages.appendChild(message);
@@ -196,6 +221,8 @@ function addMessage(text, sender) {
 }
 
 async function sendChatMessage() {
+  if (!chatInput || !chatMessages) return;
+
   const message = chatInput.value.trim();
 
   if (!message) return;
@@ -215,24 +242,19 @@ async function sendChatMessage() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        message
-      })
+      body: JSON.stringify({ message })
     });
-const data = await response.json();
 
-loading.remove();
+    const data = await response.json();
 
-if (!response.ok) {
-  addMessage(
-    data.error || JSON.stringify(data),
-    "assistant"
-  );
-  return;
-}
+    loading.remove();
 
-addMessage(data.reply, "assistant");
+    if (!response.ok) {
+      addMessage(data.error || JSON.stringify(data), "assistant");
+      return;
+    }
 
+    addMessage(data.reply, "assistant");
   } catch (error) {
     loading.remove();
 
@@ -243,10 +265,14 @@ addMessage(data.reply, "assistant");
   }
 }
 
-sendMessage.addEventListener("click", sendChatMessage);
+if (sendMessage) {
+  sendMessage.addEventListener("click", sendChatMessage);
+}
 
-chatInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
-    sendChatMessage();
-  }
-});
+if (chatInput) {
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      sendChatMessage();
+    }
+  });
+}
