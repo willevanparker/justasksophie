@@ -538,9 +538,14 @@ h3 {
     min-height: 360px;
   }
 
-  .results-panel {
-    order: -1;
-  }
+.mobile-search-panel {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.desktop-search-panel {
+  display: none;
+}
 
   .category-grid,
   .news-grid {
