@@ -74,15 +74,38 @@ if (window.mapboxgl && document.getElementById("wineMap")) {
     "pk.eyJ1Ijoid2lsbGV2YW5wYXJrZXIiLCJhIjoiY21xd2N2MGlzMWNzejJycTE2d25ndDlidyJ9.atPhHI0hq56xVEi3snh9ig";
 
   map = new mapboxgl.Map({
-    container: "wineMap",
-    style: "mapbox://styles/mapbox/streets-v12",
-    center: [-84.388, 33.749],
-    zoom: 11.5
+  container: "wineMap",
+  style: "mapbox://styles/mapbox/streets-v12",
+  center: [-84.388, 33.749],
+  zoom: 11.5
+});
+
+map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+map.on("load", () => {
+  shops.forEach((shop) => {
+    const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(`
+      <strong>${shop.name}</strong><br>
+      ${shop.neighborhood}
+    `);
+
+    const marker = new mapboxgl.Marker()
+  .setLngLat([shop.longitude, shop.latitude])
+  .setPopup(popup)
+  .addTo(map);
+
+marker.getElement().addEventListener("click", () => {
+  document.querySelectorAll(".shop-card").forEach((card) => {
+    card.classList.remove("active");
   });
 
-  map.addControl(new mapboxgl.NavigationControl(), "top-right");
-}
+  const matchingCard = document.querySelector(`[data-shop-id="${shop.id}"]`);
 
+  if (matchingCard) {
+    matchingCard.classList.add("active");
+  }
+});
+});
 // ==========================
 // Directory
 // ==========================
@@ -119,6 +142,7 @@ function renderShops(list) {
   list.forEach((shop) => {
     const card = document.createElement("article");
     card.className = "shop-card";
+card.dataset.shopId = shop.id;
 
     card.innerHTML = `
       <h3>${shop.name}</h3>
