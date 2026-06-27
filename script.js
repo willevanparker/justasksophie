@@ -1,34 +1,52 @@
 // ==========================
+// Menu
+// ==========================
+
+const menuToggle = document.getElementById("menuToggle");
+const mobileNav = document.getElementById("mobileNav");
+
+if (menuToggle && mobileNav) {
+  menuToggle.addEventListener("click", () => {
+    mobileNav.classList.toggle("open");
+    menuToggle.classList.toggle("open");
+  });
+
+  mobileNav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      mobileNav.classList.remove("open");
+      menuToggle.classList.remove("open");
+    });
+  });
+}
+
+// ==========================
+// Page Elements
+// ==========================
+
+const shopSearch = document.getElementById("shopSearch");
+const shopList = document.getElementById("shopList");
+const resultsMeta = document.getElementById("resultsMeta");
+
+let shops = [];
+let shopMarkers = [];
+let map = null;
+let mapLoaded = false;
+
+// ==========================
 // Supabase
 // ==========================
 
 const SUPABASE_URL = "https://bkaqqauzjznummgagvyq.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_OoIiQjyfri5u5JoTDdREaw_5IdEoQeG";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-let shops = [];
-let shopMarkers = [];
-
-// ==========================
-// Elements
-// ==========================
-
-const menuToggle = document.getElementById("menuToggle");
-const mobileNav = document.getElementById("mobileNav");
-const shopSearch = document.getElementById("shopSearch");
-const shopList = document.getElementById("shopList");
-const resultsMeta = document.getElementById("resultsMeta");
+const supabaseClient =
+  window.supabase && shopList
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    : null;
 
 // ==========================
 // Mapbox
 // ==========================
-
-let map = null;
-let mapLoaded = false;
 
 if (window.mapboxgl && document.getElementById("wineMap")) {
   mapboxgl.accessToken =
@@ -77,7 +95,6 @@ function addShopMarkers(list) {
 
       if (matchingCard) {
         matchingCard.classList.add("active");
-
         matchingCard.scrollIntoView({
           behavior: "smooth",
           block: "center"
@@ -94,6 +111,8 @@ function addShopMarkers(list) {
 // ==========================
 
 async function loadShops() {
+  if (!supabaseClient || !shopList) return;
+
   const { data, error } = await supabaseClient
     .from("shops")
     .select("*")
@@ -103,16 +122,14 @@ async function loadShops() {
   if (error) {
     console.error("Error loading shops from Supabase:", error);
 
-    if (shopList) {
-      shopList.innerHTML = `
-        <article class="shop-card">
-          <h3>Unable to load shops.</h3>
-          <p class="shop-description">
-            Please check your Supabase connection and public read policy.
-          </p>
-        </article>
-      `;
-    }
+    shopList.innerHTML = `
+      <article class="shop-card">
+        <h3>Unable to load shops.</h3>
+        <p class="shop-description">
+          Please check your Supabase connection and public read policy.
+        </p>
+      </article>
+    `;
 
     return;
   }
@@ -184,26 +201,27 @@ function renderShops(list) {
         ? "Results"
         : `${list.length} matching shop${list.length === 1 ? "" : "s"}`;
   }
-list.forEach((shop) => {
-  const location = shop.neighborhood
-    ? `${shop.neighborhood} · ${shop.city}, ${shop.state} ${shop.zip}`
-    : `${shop.city}, ${shop.state} ${shop.zip}`;
 
-  const card = document.createElement("article");
-  card.className = "shop-card";
-  card.dataset.shopId = shop.id;
+  list.forEach((shop) => {
+    const location = shop.neighborhood
+      ? `${shop.neighborhood} · ${shop.city}, ${shop.state} ${shop.zip}`
+      : `${shop.city}, ${shop.state} ${shop.zip}`;
 
-  card.innerHTML = `
-    <h3>${shop.name}</h3>
-    <p class="shop-location">${location}</p>
-    <p class="shop-description">${shop.description}</p>
-    <div class="shop-tags">
-      ${shop.tags.map((tag) => `<span>${tag}</span>`).join("")}
-    </div>
-    <a class="shop-link" href="${shop.website}" target="_blank" rel="noopener">
-      Visit shop →
-    </a>
-  `;
+    const card = document.createElement("article");
+    card.className = "shop-card";
+    card.dataset.shopId = shop.id;
+
+    card.innerHTML = `
+      <h3>${shop.name}</h3>
+      <p class="shop-location">${location}</p>
+      <p class="shop-description">${shop.description}</p>
+      <div class="shop-tags">
+        ${shop.tags.map((tag) => `<span>${tag}</span>`).join("")}
+      </div>
+      <a class="shop-link" href="${shop.website}" target="_blank" rel="noopener">
+        Visit shop →
+      </a>
+    `;
 
     card.addEventListener("click", () => {
       document.querySelectorAll(".shop-card").forEach((card) => {
@@ -264,22 +282,6 @@ if (shopSearch) {
 }
 
 loadShops();
-
-// ==========================
-// Menu
-// ==========================
-
-if (menuToggle && mobileNav) {
-  menuToggle.addEventListener("click", () => {
-    mobileNav.classList.toggle("open");
-  });
-
-  mobileNav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      mobileNav.classList.remove("open");
-    });
-  });
-}
 
 // ==========================
 // Chat UI
@@ -378,15 +380,5 @@ if (chatInput) {
     if (event.key === "Enter") {
       sendChatMessage();
     }
-  });
-}
-
-const menuToggle = document.getElementById("menuToggle");
-const mobileNav = document.getElementById("mobileNav");
-
-if (menuToggle && mobileNav) {
-  menuToggle.addEventListener("click", () => {
-    mobileNav.classList.toggle("open");
-    menuToggle.classList.toggle("open");
   });
 }
