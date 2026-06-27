@@ -32,6 +32,8 @@ let shopMarkers = [];
 let map = null;
 let mapLoaded = false;
 
+const INITIAL_SHOP_LIMIT = 4;
+
 // ==========================
 // Supabase
 // ==========================
@@ -63,8 +65,15 @@ if (window.mapboxgl && document.getElementById("wineMap")) {
 
   map.on("load", () => {
     mapLoaded = true;
-    addShopMarkers(shops);
+
+    const initialShops = getInitialShops();
+    addShopMarkers(initialShops);
+    fitMapToShops(initialShops);
   });
+}
+
+function getInitialShops() {
+  return shops.slice(0, INITIAL_SHOP_LIMIT);
 }
 
 function addShopMarkers(list) {
@@ -76,7 +85,7 @@ function addShopMarkers(list) {
   list.forEach((shop) => {
     const popup = new mapboxgl.Popup({ offset: 24 }).setHTML(`
       <strong>${shop.name}</strong><br>
-      ${shop.neighborhood || ""}
+      ${shop.neighborhood || `${shop.city}, ${shop.state}`}
     `);
 
     const marker = new mapboxgl.Marker()
@@ -149,8 +158,14 @@ async function loadShops() {
     hero_image: shop.hero_image
   }));
 
-  renderShops(shops);
-  addShopMarkers(shops);
+  const initialShops = getInitialShops();
+
+  renderShops(initialShops, {
+    isInitialView: true
+  });
+
+  addShopMarkers(initialShops);
+  fitMapToShops(initialShops);
 }
 
 // ==========================
@@ -158,23 +173,44 @@ async function loadShops() {
 // ==========================
 
 function fitMapToShops(list) {
-  if (!map || !list.length) return;
+  if (!map || !mapLoaded || !list.length) return;
+
+  const validShops = list.filter(
+    (shop) =>
+      Number.isFinite(shop.longitude) &&
+      Number.isFinite(shop.latitude)
+  );
+
+  if (!validShops.length) return;
+
+  if (validShops.length === 1) {
+    map.flyTo({
+      center: [validShops[0].longitude, validShops[0].latitude],
+      zoom: 13,
+      duration: 900,
+      essential: true
+    });
+
+    return;
+  }
 
   const bounds = new mapboxgl.LngLatBounds();
 
-  list.forEach((shop) => {
+  validShops.forEach((shop) => {
     bounds.extend([shop.longitude, shop.latitude]);
   });
 
   map.fitBounds(bounds, {
     padding: 80,
-    maxZoom: 14,
+    maxZoom: 13,
     duration: 900
   });
 }
 
-function renderShops(list) {
+function renderShops(list, options = {}) {
   if (!shopList) return;
+
+  const { isInitialView = false } = options;
 
   shopList.innerHTML = "";
 
@@ -192,14 +228,17 @@ function renderShops(list) {
       resultsMeta.textContent = "No matching shops";
     }
 
+    addShopMarkers([]);
     return;
   }
 
   if (resultsMeta) {
     resultsMeta.textContent =
-      list.length === shops.length
-        ? "Results"
-        : `${list.length} matching shop${list.length === 1 ? "" : "s"}`;
+      isInitialView && shops.length > list.length
+        ? `Showing ${list.length} of ${shops.length} shops`
+        : list.length === shops.length
+          ? "Results"
+          : `${list.length} matching shop${list.length === 1 ? "" : "s"}`;
   }
 
   list.forEach((shop) => {
@@ -240,6 +279,14 @@ function renderShops(list) {
       });
     });
 
+    const shopLink = card.querySelector(".shop-link");
+
+    if (shopLink) {
+      shopLink.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+    }
+
     shopList.appendChild(card);
   });
 
@@ -250,8 +297,14 @@ function filterShops(query) {
   const cleanQuery = query.trim().toLowerCase();
 
   if (!cleanQuery) {
-    renderShops(shops);
-    addShopMarkers(shops);
+    const initialShops = getInitialShops();
+
+    renderShops(initialShops, {
+      isInitialView: true
+    });
+
+    addShopMarkers(initialShops);
+    fitMapToShops(initialShops);
     return;
   }
 
@@ -265,6 +318,7 @@ function filterShops(query) {
       shop.description,
       ...shop.tags
     ]
+      .filter(Boolean)
       .join(" ")
       .toLowerCase();
 
@@ -273,6 +327,7 @@ function filterShops(query) {
 
   renderShops(filtered);
   addShopMarkers(filtered);
+  fitMapToShops(filtered);
 }
 
 if (shopSearch) {
