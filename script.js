@@ -174,7 +174,7 @@ card.dataset.shopId = shop.id;
       <p class="shop-location">
         ${shop.neighborhood} · ${shop.city}, ${shop.state} ${shop.zip}
       </p>
-      <p class="shop-description">${shop.description}</p>
+            <p class="shop-description">${shop.description}</p>
       <div class="shop-tags">
         ${shop.tags.map((tag) => `<span>${tag}</span>`).join("")}
       </div>
@@ -183,18 +183,25 @@ card.dataset.shopId = shop.id;
       </a>
     `;
 
-    shopList.appendChild(card);
     card.addEventListener("click", () => {
-  if (!map) return;
+      document.querySelectorAll(".shop-card").forEach((card) => {
+        card.classList.remove("active");
+      });
 
-  map.flyTo({
-    center: [shop.longitude, shop.latitude],
-    zoom: 14,
-    duration: 1200,
-    essential: true
+      card.classList.add("active");
+
+      if (!map) return;
+
+      map.flyTo({
+        center: [shop.longitude, shop.latitude],
+        zoom: 14,
+        duration: 1200,
+        essential: true
+      });
+    });
+
+    shopList.appendChild(card);
   });
-  });
-});
 
   fitMapToShops(list);
 }
