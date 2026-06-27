@@ -47,6 +47,21 @@ const shopSearch = document.getElementById("shopSearch");
 const shopList = document.getElementById("shopList");
 const resultsMeta = document.getElementById("resultsMeta");
 
+// ==========================
+// Mapbox
+// ==========================
+
+mapboxgl.accessToken = "pk.eyJ1Ijoid2lsbGV2YW5wYXJrZXIiLCJhIjoiY21xd2N2MGlzMWNzejJycTE2d25ndDlidyJ9.atPhHI0hq56xVEi3snh9ig";
+
+const map = new mapboxgl.Map({
+  container: "wineMap",
+  style: "mapbox://styles/mapbox/streets-v12",
+  center: [-84.388, 33.749],
+  zoom: 11.5
+});
+
+map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
 function renderShops(list) {
   shopList.innerHTML = "";
 
