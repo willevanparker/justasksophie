@@ -757,3 +757,18 @@ h3 {
 .featured-shops-label {
   display: none;
 }
+
+.shop-card.active {
+  border-color: #6f1d3f;
+  box-shadow: 0 18px 45px rgba(111, 29, 63, 0.18);
+  transform: translateY(-2px);
+}
+
+.shop-map-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.shop-map-marker.active {
+  transform: scale(1.18);
+}
