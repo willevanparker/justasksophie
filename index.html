@@ -61,12 +61,13 @@
 
   <div class="mobile-search-panel">
     <div class="search-box">
-      <input
-        type="search"
-        id="shopSearch"
-        placeholder="Try Atlanta, 30306, or Georgia"
-        aria-label="Search wine shops"
-      />
+<input
+  type="search"
+  id="shopSearch"
+  placeholder="Try Atlanta, 30306, or Georgia"
+  aria-label="Search wine shops"
+  oninput="filterShops(this.value)"
+/>
     </div>
 
   </div>
