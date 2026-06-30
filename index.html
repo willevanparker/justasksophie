@@ -36,10 +36,11 @@
   <nav class="mobile-nav" id="mobileNav">
     <a href="#directory">Directory</a>
     <a href="#shop">Shop</a>
-   <a href="about.html">About</a>
+    <a href="about.html">About</a>
     <a href="#newsletter">Newsletter</a>
-    <a href="#submit">Submit a Shop</a>
+    <a href="#submit-shop" data-open-submit-shop>Submit a Shop</a>
   </nav>
+
   <main>
     <section class="hero">
       <div class="hero-inner">
@@ -90,6 +91,12 @@ Local wine shops are the heart of the wine community. They connect passionate pr
 
       <div class="shop-list" id="shopList"></div>
     </aside>
+  </div>
+
+  <div class="submit-shop-cta" id="submit-shop">
+    <button type="button" class="submit-shop-cta-button" data-open-submit-shop>
+      Submit a shop 📥
+    </button>
   </div>
 </section>
 
@@ -163,6 +170,107 @@ Local wine shops are the heart of the wine community. They connect passionate pr
 </section>
 
   </main>
+
+<div
+  class="submit-shop-overlay"
+  id="submitShopOverlay"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="submitShopTitle"
+  hidden
+>
+  <div class="submit-shop-modal">
+    <button
+      type="button"
+      class="submit-shop-close"
+      id="closeSubmitShop"
+      aria-label="Close submit shop form"
+    >
+      ×
+    </button>
+
+    <div class="submit-shop-content" id="submitShopContent">
+      <p class="eyebrow">Submit a Shop</p>
+      <h2 id="submitShopTitle">Know a great local wine shop?</h2>
+      <p class="submit-shop-intro">
+        Send us the basics and we will review it before it appears on ShopLocal.Wine.
+      </p>
+
+      <form class="submit-shop-form" id="submitShopForm">
+        <div class="form-field">
+          <label for="submitShopName">Shop name *</label>
+          <input type="text" id="submitShopName" name="name" required />
+        </div>
+
+        <div class="form-field">
+          <label for="submitShopWebsite">Website</label>
+          <input type="url" id="submitShopWebsite" name="website" />
+        </div>
+
+        <div class="form-field form-field-wide">
+          <label for="submitShopAddress">Street address</label>
+          <input type="text" id="submitShopAddress" name="address" />
+        </div>
+
+        <div class="form-field">
+          <label for="submitShopCity">City *</label>
+          <input type="text" id="submitShopCity" name="city" required />
+        </div>
+
+        <div class="form-field">
+          <label for="submitShopState">State *</label>
+          <input type="text" id="submitShopState" name="state" required />
+        </div>
+
+        <div class="form-field">
+          <label for="submitShopZip">ZIP</label>
+          <input type="text" id="submitShopZip" name="zip" inputmode="numeric" />
+        </div>
+
+        <div class="form-field">
+          <label for="submitShopNeighborhood">Neighborhood</label>
+          <input type="text" id="submitShopNeighborhood" name="neighborhood" />
+        </div>
+
+        <div class="form-field form-field-wide">
+          <label for="submitShopDescription">Short description</label>
+          <textarea id="submitShopDescription" name="description" rows="3"></textarea>
+        </div>
+
+        <div class="form-field form-field-wide">
+          <label for="submitShopTags">Tags</label>
+          <input
+            type="text"
+            id="submitShopTags"
+            name="tags"
+            placeholder="Natural wine, tastings, neighborhood favorite"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="submitContactName">Contact name</label>
+          <input type="text" id="submitContactName" name="contact_name" />
+        </div>
+
+        <div class="form-field">
+          <label for="submitContactEmail">Contact email *</label>
+          <input type="email" id="submitContactEmail" name="contact_email" required />
+        </div>
+
+        <div class="form-field form-field-wide">
+          <label for="submitShopInstagram">Instagram URL or handle</label>
+          <input type="text" id="submitShopInstagram" name="instagram" />
+        </div>
+
+        <p class="submit-shop-error" id="submitShopError" role="alert"></p>
+
+        <button type="submit" class="submit-shop-button" id="submitShopButton">
+          Submit shop
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
 
 <button
   class="concierge-button"
