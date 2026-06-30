@@ -24,6 +24,7 @@ if (menuToggle && mobileNav) {
 // ==========================
 
 const shopSearch = document.getElementById("shopSearch");
+const shopSearchDesktop = document.getElementById("shopSearchDesktop");
 const shopList = document.getElementById("shopList");
 const resultsMeta = document.getElementById("resultsMeta");
 
@@ -32,6 +33,8 @@ let shopMarkers = [];
 let map = null;
 let mapLoaded = false;
 let activeShopId = null;
+
+const MAP_CARD_LIMIT = 4;
 
 // ==========================
 // Supabase
@@ -69,7 +72,7 @@ if (window.mapboxgl && document.getElementById("wineMap")) {
   });
 
   map.on("moveend", () => {
-    const hasSearch = shopSearch && shopSearch.value.trim();
+    const hasSearch = getSearchQuery();
 
     if (hasSearch) return;
 
@@ -158,9 +161,8 @@ function renderAllMarkers() {
     marker.getElement().addEventListener("click", () => {
       setActiveShop(shop.id);
 
-      const visibleShops = getVisibleShopsInMap();
-      const shopIsVisibleInCards = visibleShops.some(
-        (visibleShop) => visibleShop.id === shop.id
+      const shopIsVisibleInCards = document.querySelector(
+        `.shop-card[data-shop-id="${shop.id}"]`
       );
 
       if (!shopIsVisibleInCards) {
@@ -259,6 +261,8 @@ function renderShops(list, options = {}) {
   if (!shopList) return;
 
   const { mode = "map" } = options;
+  const shouldLimitCards = mode === "map" && list.length > MAP_CARD_LIMIT;
+  const visibleList = shouldLimitCards ? list.slice(0, MAP_CARD_LIMIT) : list;
 
   shopList.innerHTML = "";
 
@@ -287,13 +291,13 @@ function renderShops(list, options = {}) {
     } else if (mode === "selected") {
       resultsMeta.textContent = "Selected shop";
     } else {
-      resultsMeta.textContent = `${list.length} shop${
+      resultsMeta.textContent = `${visibleList.length} of ${list.length} shop${
         list.length === 1 ? "" : "s"
       } in this map area`;
     }
   }
 
-  list.forEach((shop) => {
+  visibleList.forEach((shop) => {
     const location = shop.neighborhood
       ? `${shop.neighborhood} · ${shop.city}, ${shop.state} ${shop.zip}`
       : `${shop.city}, ${shop.state} ${shop.zip}`;
@@ -341,6 +345,18 @@ function renderShops(list, options = {}) {
 
     shopList.appendChild(card);
   });
+
+  if (shouldLimitCards) {
+    const note = document.createElement("article");
+    note.className = "shop-card shop-card-note";
+    note.innerHTML = `
+      <h3>${list.length - MAP_CARD_LIMIT} more nearby</h3>
+      <p class="shop-description">
+        Move the map, zoom in, or search by city, ZIP, state, or shop name to narrow the list.
+      </p>
+    `;
+    shopList.appendChild(note);
+  }
 }
 
 const stateNames = {
@@ -397,10 +413,40 @@ function filterShops(query) {
   fitMapToShops(filtered);
 }
 
-if (shopSearch) {
-  shopSearch.oninput = (event) => {
-    filterShops(event.target.value);
-  };
+function getSearchQuery() {
+  return [shopSearch, shopSearchDesktop]
+    .map((input) => (input ? input.value.trim() : ""))
+    .find(Boolean) || "";
+}
+
+function syncSearchInputs(value, sourceInput) {
+  [shopSearch, shopSearchDesktop].forEach((input) => {
+    if (input && input !== sourceInput) {
+      input.value = value;
+    }
+  });
+}
+
+function handleSearchInput(event) {
+  const value = event.target.value;
+
+  syncSearchInputs(value, event.target);
+  filterShops(value);
+}
+
+[shopSearch, shopSearchDesktop].forEach((input) => {
+  if (input) {
+    input.addEventListener("input", handleSearchInput);
+  }
+});
+
+window.filterShops = (query) => {
+  syncSearchInputs(query, null);
+  filterShops(query);
+};
+
+if (shopSearch && shopSearch.value) {
+  syncSearchInputs(shopSearch.value, shopSearch);
 }
 
 loadShops();
@@ -436,6 +482,47 @@ if (openConcierge && closeConcierge && chatOverlay) {
 const chatMessages = document.getElementById("chatMessages");
 const chatInput = document.getElementById("chatInput");
 const sendMessage = document.getElementById("sendMessage");
+const SOPHIE_HISTORY_KEY = "sophieConversationHistory";
+const SOPHIE_HISTORY_LIMIT = 12;
+
+let conversationHistory = loadConversationHistory();
+
+function loadConversationHistory() {
+  try {
+    const storedHistory = JSON.parse(
+      window.localStorage.getItem(SOPHIE_HISTORY_KEY) || "[]"
+    );
+
+    if (!Array.isArray(storedHistory)) return [];
+
+    return storedHistory
+      .filter(
+        (message) =>
+          ["user", "assistant"].includes(message.role) &&
+          typeof message.content === "string"
+      )
+      .slice(-SOPHIE_HISTORY_LIMIT);
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveConversationHistory() {
+  try {
+    window.localStorage.setItem(
+      SOPHIE_HISTORY_KEY,
+      JSON.stringify(conversationHistory.slice(-SOPHIE_HISTORY_LIMIT))
+    );
+  } catch (error) {
+    // Some browsers restrict localStorage in private or embedded contexts.
+  }
+}
+
+function rememberMessage(role, content) {
+  conversationHistory.push({ role, content });
+  conversationHistory = conversationHistory.slice(-SOPHIE_HISTORY_LIMIT);
+  saveConversationHistory();
+}
 
 function addMessage(text, sender) {
   if (!chatMessages) return;
@@ -448,6 +535,12 @@ function addMessage(text, sender) {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+function restoreConversationMessages() {
+  conversationHistory.forEach((message) => {
+    addMessage(message.content, message.role);
+  });
+}
+
 async function sendChatMessage() {
   if (!chatInput || !chatMessages) return;
 
@@ -456,6 +549,7 @@ async function sendChatMessage() {
   if (!message) return;
 
   addMessage(message, "user");
+  rememberMessage("user", message);
   chatInput.value = "";
 
   const loading = document.createElement("div");
@@ -470,7 +564,10 @@ async function sendChatMessage() {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({
+        message,
+        messages: conversationHistory
+      })
     });
 
     const data = await response.json();
@@ -483,6 +580,7 @@ async function sendChatMessage() {
     }
 
     addMessage(data.reply, "assistant");
+    rememberMessage("assistant", data.reply);
   } catch (error) {
     loading.remove();
 
@@ -492,6 +590,8 @@ async function sendChatMessage() {
     );
   }
 }
+
+restoreConversationMessages();
 
 if (sendMessage) {
   sendMessage.addEventListener("click", sendChatMessage);
