@@ -230,7 +230,7 @@
         </div>
       </div>
 
-      <aside class="about-note">
+            <aside class="about-note">
         <h2>Why local?</h2>
         <p>
           Because a good wine shop is part guide, part gathering place, and part small business worth rooting for.
@@ -240,20 +240,15 @@
 
   </main>
 
-  <footer class="site-footer">
-    <div>
-      <a href="index.html" class="footer-logo">ShopLocal.Wine</a>
-      <p>Made with ❤️ in Atlanta, GA.</p>
-    </div>
+  <div id="siteFooter"></div>
 
-    <div class="footer-links">
-      <a href="index.html#directory">Directory</a>
-      <a href="index.html#shop">Shop</a>
-      <a href="about.html">About</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="terms.html">Terms</a>
-    </div>
-  </footer>
+  <script>
+    fetch("/footer.html")
+      .then((response) => response.text())
+      .then((html) => {
+        document.getElementById("siteFooter").innerHTML = html;
+      });
+  </script>
 
   <script src="script.js"></script>
 
