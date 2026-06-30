@@ -203,7 +203,7 @@ Local wine shops are the heart of the wine community. They connect passionate pr
 
     </div>
 
-    <div class="chat-disclaimer">
+       <div class="chat-disclaimer">
       Sophie provides general information and can make mistakes. Check important details before making decisions.
     </div>
 
@@ -225,24 +225,19 @@ Local wine shops are the heart of the wine community. They connect passionate pr
 
 </div>
 
-  <footer class="site-footer">
-    <div>
-      <a href="/" class="footer-logo">ShopLocal.Wine</a>
-      <p>Made with ❤️ in Atlanta, GA.</p>
-    </div>
+<div id="siteFooter"></div>
 
-    <div class="footer-links">
-      <a href="#directory">Directory</a>
-      <a href="#shop">Shop</a>
-      <a href="about.html">About</a>
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Affiliate</a>
-    </div>
-  </footer>
+<script>
+  fetch("/footer.html")
+    .then((response) => response.text())
+    .then((html) => {
+      document.getElementById("siteFooter").innerHTML = html;
+    });
+</script>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.25.0/mapbox-gl.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
