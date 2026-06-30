@@ -49,6 +49,210 @@ const supabaseClient =
     : null;
 
 // ==========================
+// Submit a Shop
+// ==========================
+
+const submitShopOverlay = document.getElementById("submitShopOverlay");
+const submitShopContent = document.getElementById("submitShopContent");
+const closeSubmitShop = document.getElementById("closeSubmitShop");
+const submitShopTriggers = document.querySelectorAll("[data-open-submit-shop]");
+
+let submitShopLastFocused = null;
+const initialSubmitShopMarkup = submitShopContent
+  ? submitShopContent.innerHTML
+  : "";
+
+function resetSubmitShopModal() {
+  if (!submitShopContent) return;
+
+  submitShopContent.innerHTML = initialSubmitShopMarkup;
+  bindSubmitShopForm();
+}
+
+function openSubmitShopModal(event) {
+  if (event) {
+    event.preventDefault();
+  }
+
+  if (!submitShopOverlay) return;
+
+  submitShopLastFocused = document.activeElement;
+
+  if (submitShopContent && submitShopContent.querySelector(".submit-shop-thanks")) {
+    resetSubmitShopModal();
+  }
+
+  submitShopOverlay.hidden = false;
+  submitShopOverlay.classList.add("open");
+  document.body.classList.add("modal-open");
+
+  const firstField = submitShopOverlay.querySelector("input, textarea");
+
+  if (firstField) {
+    firstField.focus();
+  }
+}
+
+function closeSubmitShopModal() {
+  if (!submitShopOverlay) return;
+
+  submitShopOverlay.classList.remove("open");
+  submitShopOverlay.hidden = true;
+  document.body.classList.remove("modal-open");
+
+  if (submitShopLastFocused && typeof submitShopLastFocused.focus === "function") {
+    submitShopLastFocused.focus();
+  }
+}
+
+function getTrimmedValue(formData, key) {
+  return String(formData.get(key) || "").trim();
+}
+
+function getSubmissionPayload(form) {
+  const formData = new FormData(form);
+  const tags = getTrimmedValue(formData, "tags")
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+
+  return {
+    name: getTrimmedValue(formData, "name"),
+    website: getTrimmedValue(formData, "website") || null,
+    address: getTrimmedValue(formData, "address") || null,
+    city: getTrimmedValue(formData, "city"),
+    state: getTrimmedValue(formData, "state"),
+    zip: getTrimmedValue(formData, "zip") || null,
+    neighborhood: getTrimmedValue(formData, "neighborhood") || null,
+    description: getTrimmedValue(formData, "description") || null,
+    tags,
+    contact_name: getTrimmedValue(formData, "contact_name") || null,
+    contact_email: getTrimmedValue(formData, "contact_email"),
+    instagram: getTrimmedValue(formData, "instagram") || null,
+    is_published: false,
+    submission_source: "website",
+    created_at: new Date().toISOString()
+  };
+}
+
+function showSubmitShopThanks() {
+  if (!submitShopContent) return;
+
+  submitShopContent.innerHTML = `
+    <div class="submit-shop-thanks">
+      <p class="eyebrow">Thank You</p>
+      <h2 id="submitShopTitle">Thanks for submitting a shop.</h2>
+      <p>
+        We review every submission before it appears on ShopLocal.Wine.
+      </p>
+      <button type="button" id="submitShopThanksClose">Close</button>
+    </div>
+  `;
+
+  const thanksClose = document.getElementById("submitShopThanksClose");
+
+  if (thanksClose) {
+    thanksClose.addEventListener("click", closeSubmitShopModal);
+    thanksClose.focus();
+  }
+}
+
+async function handleSubmitShop(event) {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const button = form.querySelector("#submitShopButton");
+  const errorMessage = form.querySelector("#submitShopError");
+
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  if (!supabaseClient) {
+    if (errorMessage) {
+      errorMessage.textContent =
+        "Sorry, the submission form is not available right now. Please try again soon.";
+      errorMessage.classList.add("visible");
+    }
+
+    return;
+  }
+
+  if (errorMessage) {
+    errorMessage.textContent = "";
+    errorMessage.classList.remove("visible");
+  }
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Submitting...";
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("shops")
+      .insert([getSubmissionPayload(form)]);
+
+    if (error) {
+      throw error;
+    }
+
+    form.reset();
+    showSubmitShopThanks();
+  } catch (error) {
+    console.error("Error submitting shop:", error);
+
+    if (errorMessage) {
+      errorMessage.textContent =
+        "Sorry, we couldn't submit that shop right now. Please check the details and try again.";
+      errorMessage.classList.add("visible");
+    }
+  } finally {
+    if (button && submitShopContent && submitShopContent.contains(button)) {
+      button.disabled = false;
+      button.textContent = "Submit shop";
+    }
+  }
+}
+
+function bindSubmitShopForm() {
+  const currentForm = document.getElementById("submitShopForm");
+
+  if (currentForm) {
+    currentForm.addEventListener("submit", handleSubmitShop);
+  }
+}
+
+submitShopTriggers.forEach((trigger) => {
+  trigger.addEventListener("click", openSubmitShopModal);
+});
+
+if (closeSubmitShop) {
+  closeSubmitShop.addEventListener("click", closeSubmitShopModal);
+}
+
+if (submitShopOverlay) {
+  submitShopOverlay.addEventListener("click", (event) => {
+    if (event.target === submitShopOverlay) {
+      closeSubmitShopModal();
+    }
+  });
+}
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape" &&
+    submitShopOverlay &&
+    submitShopOverlay.classList.contains("open")
+  ) {
+    closeSubmitShopModal();
+  }
+});
+
+bindSubmitShopForm();
+
+// ==========================
 // Mapbox
 // ==========================
 
