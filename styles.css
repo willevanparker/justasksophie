@@ -266,6 +266,10 @@ h3 {
 
 .results-panel {
   padding: 18px;
+  display: flex;
+  flex-direction: column;
+  max-height: 620px;
+  min-height: 0;
 }
 
 .search-box {
@@ -297,6 +301,9 @@ h3 {
 .shop-list {
   display: grid;
   gap: 14px;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
 }
 
 .shop-card {
@@ -304,6 +311,11 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 18px;
   background: #fff;
+}
+
+.shop-card-note {
+  cursor: default;
+  background: var(--surface-alt);
 }
 
 .shop-card h3 {
@@ -537,6 +549,10 @@ h3 {
 
   .directory-layout {
     min-height: auto;
+  }
+
+  .results-panel {
+    max-height: 460px;
   }
   
 .map-panel,
@@ -818,6 +834,12 @@ h3 {
 
 .mapboxgl-marker {
   cursor: pointer;
+}
+
+.shop-card-note,
+.shop-card-note:hover {
+  cursor: default;
+  transform: none;
 }
 
 /* ==========================================
