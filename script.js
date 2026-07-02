@@ -762,7 +762,7 @@ async function sendChatMessage() {
 
   const loading = document.createElement("div");
   loading.className = "assistant-message";
-  loading.textContent = "Thinking...";
+  loading.textContent = "...";
   chatMessages.appendChild(loading);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
